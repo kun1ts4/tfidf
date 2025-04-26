@@ -4,8 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
-	"tfidf/internal/model"
-	"tfidf/internal/parser"
 	"tfidf/internal/service"
 )
 
@@ -29,9 +27,12 @@ func UploadFile(c *gin.Context) {
 		})
 	}
 
-	words := parser.ExtractWords(content)
-	stats := service.CalculateTFIDF(words)
-	top50 := model.TopIDFRange(stats, 0, 50)
+	top50, err := service.ProcessFile(content, 50)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+	}
 
 	c.HTML(http.StatusOK, "result.html", gin.H{
 		"Words": top50,

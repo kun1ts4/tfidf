@@ -6,7 +6,10 @@
     <link rel="stylesheet" href="/styles/styles.css">
 </head>
 <body>
-    <h1>Загрузите текстовый файл</h1>
+    <div>
+        <h1>Загрузите текстовый файл</h1>
+        <p>Каждый абзац считается отдельным документом, а файл — набором документов</p>
+    </div>
     <form action="/upload" method="POST" enctype="multipart/form-data">
         <input type="file" name="file" accept=".txt" required>
         <button type="submit">Загрузить</button>

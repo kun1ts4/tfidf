@@ -10,7 +10,13 @@ type WordTFIDF struct {
 
 func TopIDFRange(all []WordTFIDF, n int, m int) []WordTFIDF {
 	sort.Slice(all, func(i, j int) bool {
-		return all[i].TF > all[j].TF
+		if all[i].IDF == all[j].IDF {
+			if all[i].TF == all[j].TF {
+				return all[i].Word < all[j].Word
+			}
+			return all[i].TF > all[j].TF
+		}
+		return all[i].IDF > all[j].IDF
 	})
 
 	start := min(n, len(all))

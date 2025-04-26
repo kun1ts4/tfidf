@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="/styles/styles.css">
 </head>
 <body>
-    <h1>Топ 50 слов по TF-IDF</h1>
+    <h1>Топ слов по TF-IDF</h1>
     <table>
         <tr>
             <th>Слово</th>
@@ -17,7 +17,7 @@
         <tr>
             <td>{{ .Word }}</td>
             <td>{{ .TF }}</td>
-            <td>{{ .IDF }}</td>
+            <td>{{ printf "%.4f" .IDF }}</td>
         </tr>
         {{ end }}
     </table>
