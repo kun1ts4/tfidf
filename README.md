@@ -46,6 +46,15 @@ docker-compose up -d
 | DB_NAME    | Имя базы данных                    | postgres        |
 | API_PORT   | Порт для API                       | 8080            |
 
+пример `.env`:
+```
+API_PORT=8080
+DB_PORT=5432
+DB_NAME=postgres
+DB_USER=user
+DB_PASSWORD=password
+```
+
 ## Версия
 
 v1.0
