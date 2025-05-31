@@ -1,0 +1,8 @@
+app:
+  port: 8080
+  version: v1.0
+
+database:
+  host: db
+  port: 5432
+  name: postgres

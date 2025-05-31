@@ -3,9 +3,10 @@ package model
 import "sort"
 
 type WordTFIDF struct {
-	Word string
-	TF   float64
-	IDF  float64
+	Word string  `json:"word"`
+	TF   float64 `json:"-"`
+	IDF  float64 `json:"-" `
+	Freq int     `json:"frequency"`
 }
 
 func TopIDFRange(all []WordTFIDF, n int, m int) []WordTFIDF {

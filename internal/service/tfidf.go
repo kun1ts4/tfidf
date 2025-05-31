@@ -37,6 +37,7 @@ func CalculateTFIDF(allDocs [][]string) []model.WordTFIDF {
 			Word: word,
 			TF:   tf,
 			IDF:  idf,
+			Freq: count,
 		}
 		stats = append(stats, stat)
 	}
