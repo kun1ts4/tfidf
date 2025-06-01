@@ -44,7 +44,9 @@ func LoadConfig() (*AppConfig, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	config.App.Port = os.Getenv("API_PORT")
+	config.Database.Host = os.Getenv("DB_HOST")
 	config.Database.Port = os.Getenv("DB_PORT")
 	config.Database.Name = os.Getenv("DB_NAME")
 	config.Database.User = os.Getenv("DB_USER")
