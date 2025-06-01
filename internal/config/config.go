@@ -10,16 +10,16 @@ import (
 
 type AppConfig struct {
 	App struct {
-		Port    string `yaml:"port"`
+		Port    string
 		Version string `yaml:"version"`
 	} `yaml:"app"`
 	Database struct {
-		Host     string `yaml:"host"`
-		Port     string `yaml:"port"`
-		Name     string `yaml:"name"`
+		Host     string
+		Port     string
+		Name     string
 		User     string
 		Password string
-	} `yaml:"database"`
+	}
 }
 
 func LoadConfig() (*AppConfig, error) {
@@ -44,7 +44,9 @@ func LoadConfig() (*AppConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	config.App.Port = os.Getenv("API_PORT")
+	config.Database.Port = os.Getenv("DB_PORT")
+	config.Database.Name = os.Getenv("DB_NAME")
 	config.Database.User = os.Getenv("DB_USER")
 	config.Database.Password = os.Getenv("DB_PASSWORD")
 
