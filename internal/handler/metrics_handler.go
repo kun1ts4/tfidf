@@ -4,8 +4,19 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	_ "tfidf/cmd/api/docs"
+	"tfidf/internal/model"
 )
 
+// GetMetrics godoc
+// @Summary Get all metrics
+// @Description Retrieve various metrics related to file processing
+// @Tags metrics
+// @Accept json
+// @Produce json
+// @Success 200 {object} model.Metrics "Metrics retrieved successfully"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /metrics [get]
 func (h *Handler) GetMetrics(c *gin.Context) {
 	peakUploadTime, err := h.repo.GetPeakUploadTime(c.Request.Context())
 	if err != nil {
@@ -16,7 +27,7 @@ func (h *Handler) GetMetrics(c *gin.Context) {
 		return
 	}
 
-	WordTFIDF, err := h.repo.GetTopFreqWords(c.Request.Context(), 5)
+	topFreqWords, err := h.repo.GetTopFreqWords(c.Request.Context(), 5)
 	if err != nil {
 		log.Printf("ошибка получения топ-5 частотных слов %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -70,13 +81,13 @@ func (h *Handler) GetMetrics(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"peak_upload_time":                peakUploadTime,
-		"top_frequencies_words":           WordTFIDF,
-		"files_processed":                 filesProcessed,
-		"min_time_processed":              minTimeProcessed,
-		"avg_time_processed":              avgTimeProcessed,
-		"max_time_processed":              maxTimeProcessed,
-		"latest_file_processed_timestamp": latestFileProcessedTimestamp,
+	c.JSON(http.StatusOK, model.Metrics{
+		PeakUploadTime:               peakUploadTime,
+		TopFrequenciesWords:          topFreqWords,
+		FilesProcessed:               filesProcessed,
+		MinTimeProcessed:             minTimeProcessed,
+		AvgTimeProcessed:             avgTimeProcessed,
+		MaxTimeProcessed:             maxTimeProcessed,
+		LatestFileProcessedTimestamp: latestFileProcessedTimestamp,
 	})
 }

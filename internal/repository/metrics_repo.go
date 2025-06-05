@@ -22,21 +22,6 @@ func (r *Repository) CreateMetricsTables(ctx context.Context) error {
 		return err
 	}
 
-	query = `
-		CREATE TABLE IF NOT EXISTS file_uploads(
-		    id SERIAL PRIMARY KEY,
-		    file_name TEXT NOT NULL,
-		    time_processed NUMERIC(10,3),
-		    upload_time TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-		)
-	`
-
-	_, err = r.pool.Exec(ctx, query)
-	if err != nil {
-		log.Printf("не удалось создать таблицу file_uploads: %v", err)
-		return err
-	}
-
 	return nil
 }
 
@@ -53,23 +38,23 @@ func (r *Repository) RecordWordFrequency(ctx context.Context, word string, freq 
 	return nil
 }
 
-func (r *Repository) RecordFileUpload(ctx context.Context, fileName string, timeProcessed float64) error {
-	query := `
-		INSERT INTO file_uploads (file_name, time_processed)
-		VALUES ($1, $2)
-	`
-	_, err := r.pool.Exec(ctx, query, fileName, timeProcessed)
-	if err != nil {
-		log.Printf("не удалось сохранить информацию о загрузке файла %s: %v", fileName, err)
-		return err
-	}
-	return nil
-}
+//func (r *Repository) RecordFileUpload(ctx context.Context, fileName string, timeProcessed float64) error {
+//	query := `
+//		INSERT INTO documents (file_name, time_processed)
+//		VALUES ($1, $2)
+//	`
+//	_, err := r.pool.Exec(ctx, query, fileName, timeProcessed)
+//	if err != nil {
+//		log.Printf("не удалось сохранить информацию о загрузке файла %s: %v", fileName, err)
+//		return err
+//	}
+//	return nil
+//}
 
 func (r *Repository) GetPeakUploadTime(ctx context.Context) (string, error) {
 	query := `
 		SELECT TO_CHAR(upload_time, 'HH24:00') AS upload_hour 
-		FROM file_uploads 
+		FROM documents
 		GROUP BY upload_hour 
 		ORDER BY COUNT(*) DESC 
 		LIMIT 1`
@@ -84,7 +69,7 @@ func (r *Repository) GetPeakUploadTime(ctx context.Context) (string, error) {
 	return uploadHour, nil
 }
 
-func (r *Repository) GetTopFreqWords(ctx context.Context, limit int) ([]model.WordTFIDF, error) {
+func (r *Repository) GetTopFreqWords(ctx context.Context, limit int) ([]model.Word, error) {
 	query := `SELECT word, freq FROM word_frequencies ORDER BY freq DESC LIMIT $1`
 
 	rows, err := r.pool.Query(ctx, query, limit)
@@ -93,7 +78,7 @@ func (r *Repository) GetTopFreqWords(ctx context.Context, limit int) ([]model.Wo
 	}
 	defer rows.Close()
 
-	var result []model.WordTFIDF
+	var result []model.Word
 
 	for rows.Next() {
 		var word string
@@ -101,7 +86,7 @@ func (r *Repository) GetTopFreqWords(ctx context.Context, limit int) ([]model.Wo
 		if err := rows.Scan(&word, &freq); err != nil {
 			return nil, fmt.Errorf("не удалось отсканировать строку: %v", err)
 		}
-		result = append(result, model.WordTFIDF{
+		result = append(result, model.Word{
 			Word: word,
 			Freq: freq,
 		})
@@ -110,12 +95,12 @@ func (r *Repository) GetTopFreqWords(ctx context.Context, limit int) ([]model.Wo
 	return result, nil
 }
 
-func (r *Repository) GetFilesProcessed(ctx context.Context) (float64, error) {
+func (r *Repository) GetFilesProcessed(ctx context.Context) (int, error) {
 	query := `
-		SELECT COUNT(*) FROM file_uploads
+		SELECT COUNT(*) FROM documents
 	`
 
-	var count float64
+	var count int
 	err := r.pool.QueryRow(ctx, query).Scan(&count)
 	if err != nil {
 		return 0, fmt.Errorf("не удалось получить количество обработанных файлов: %v", err)
@@ -126,7 +111,7 @@ func (r *Repository) GetFilesProcessed(ctx context.Context) (float64, error) {
 
 func (r *Repository) GetMinTimeProcessed(ctx context.Context) (float64, error) {
 	query := `
-		SELECT MIN(time_processed) FROM file_uploads
+		SELECT MIN(time_processed) FROM documents
 	`
 
 	var minTime float64
@@ -140,7 +125,7 @@ func (r *Repository) GetMinTimeProcessed(ctx context.Context) (float64, error) {
 
 func (r *Repository) GetMaxTimeProcessed(ctx context.Context) (float64, error) {
 	query := `
-		SELECT MAX(time_processed) FROM file_uploads
+		SELECT MAX(time_processed) FROM documents
 	`
 
 	var maxTime float64
@@ -154,7 +139,7 @@ func (r *Repository) GetMaxTimeProcessed(ctx context.Context) (float64, error) {
 
 func (r *Repository) GetAvgTimeProcessed(ctx context.Context) (float64, error) {
 	query := `
-		SELECT AVG(time_processed) FROM file_uploads
+		SELECT AVG(time_processed) FROM documents
 	`
 
 	var avgTime float64
@@ -170,7 +155,7 @@ func (r *Repository) GetAvgTimeProcessed(ctx context.Context) (float64, error) {
 
 func (r *Repository) GetLatestFileProcessedTimestamp(ctx context.Context) (string, error) {
 	query := `
-		SELECT TO_CHAR(upload_time, 'YYYY-MM-DD HH24:MI:SS') FROM file_uploads
+		SELECT TO_CHAR(upload_time, 'YYYY-MM-DD HH24:MI:SS') FROM documents
 		ORDER BY upload_time DESC LIMIT 1
 	`
 

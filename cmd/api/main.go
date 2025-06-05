@@ -3,48 +3,68 @@ package main
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"log"
 	"tfidf/internal/config"
+	"tfidf/internal/db"
 	"tfidf/internal/handler"
 	"tfidf/internal/repository"
-	"tfidf/pkg/db"
+
+	"tfidf/internal/service"
 )
 
+// @title         TF-IDF API
+// @description   Это простой сервис, который помогает анализировать текстовые документы с помощью метода TF-IDF
+// @BasePath      /
 func main() {
-	cfg, err := config.LoadConfig()
+	cfg, err := config.Initialize()
 	if err != nil {
-		log.Fatalf("не удалось загрузить конфигурацию: %v", err)
+		log.Fatalf("не удалось инициализировать конфигурацию: %v", err)
 	}
 
-	pgxConn, err := db.NewConnection(context.Background(), cfg)
+	pgxPool, err := db.Initialize(context.Background(), cfg)
 	if err != nil {
-		log.Fatalf("не удалось подключиться к базе данных: %v", err.Error())
+		log.Fatalf("не удалось инициализировать базу данных: %v", err)
 	}
-	defer pgxConn.Close()
+	defer pgxPool.Close()
 
-	repo := repository.NewRepository(pgxConn)
-	err = repo.CreateMetricsTables(context.Background())
-	if err != nil {
-		log.Fatalf("не удалось создать таблицы: %v", err)
+	repo := repository.NewRepository(pgxPool)
+	if err := db.InitializeTables(repo); err != nil {
+		log.Fatalf("не удалось инициализировать таблицы: %v", err)
 	}
 
+	tokenService := service.NewTokenService("secret")
+	h := handler.NewHandler(repo, tokenService)
+
+	r := SetupRouter(h)
+
+	if err := r.Run(":" + cfg.App.Port); err != nil {
+		log.Fatalf("не удалось запустить сервер: %v", err)
+	}
+}
+
+func SetupRouter(h *handler.Handler) *gin.Engine {
 	r := gin.Default()
 
 	r.Static("/styles", "./web/templates")
 	r.LoadHTMLGlob("web/templates/*")
 
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	r.GET("/status", handler.Status)
 	r.GET("/version", handler.Version)
 	r.GET("/", handler.ShowForm)
+	r.POST("/register", h.RegisterUser)
+	r.POST("/login", h.Login)
 
-	uploadHandler := handler.NewHandler(repo)
-	r.POST("/upload", uploadHandler.UploadFile)
+	r.GET("/metrics", h.GetMetrics)
 
-	metricsHandler := handler.NewHandler(repo)
-	r.GET("/metrics", metricsHandler.GetMetrics)
-
-	err = r.Run(":" + cfg.App.Port)
-	if err != nil {
-		return
+	authorized := r.Group("/")
+	authorized.Use(h.Auth)
+	{
+		r.POST("/upload", h.UploadFile)
 	}
+
+	return r
 }

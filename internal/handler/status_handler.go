@@ -3,9 +3,16 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	_ "tfidf/cmd/api/docs"
 	"tfidf/internal/config"
 )
 
+// Status godoc
+// @Summary Status endpoint
+// @Description app status check
+// @Tags status
+// @Success 200 {string} string "OK"
+// @Router /status [get]
 func Status(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status": "OK",

@@ -2,10 +2,11 @@ package service
 
 import (
 	"math"
+	"sort"
 	"tfidf/internal/model"
 )
 
-func CalculateTFIDF(allDocs [][]string) []model.WordTFIDF {
+func CalculateTFIDF(allDocs [][]string) []model.Word {
 	docCount := len(allDocs)
 	wordDocFrequency := make(map[string]int)
 	wordTotalFrequency := make(map[string]int)
@@ -23,7 +24,7 @@ func CalculateTFIDF(allDocs [][]string) []model.WordTFIDF {
 		totalWords += len(doc)
 	}
 
-	stats := make([]model.WordTFIDF, 0, len(wordTotalFrequency))
+	stats := make([]model.Word, 0, len(wordTotalFrequency))
 
 	for word, count := range wordTotalFrequency {
 		tf := float64(count) / float64(totalWords)
@@ -33,7 +34,7 @@ func CalculateTFIDF(allDocs [][]string) []model.WordTFIDF {
 			idf = math.Log(float64(docCount) / float64(df))
 		}
 
-		stat := model.WordTFIDF{
+		stat := model.Word{
 			Word: word,
 			TF:   tf,
 			IDF:  idf,
@@ -42,4 +43,20 @@ func CalculateTFIDF(allDocs [][]string) []model.WordTFIDF {
 		stats = append(stats, stat)
 	}
 	return stats
+}
+
+func TopIDFRange(all []model.Word, n int, m int) []model.Word {
+	sort.Slice(all, func(i, j int) bool {
+		if all[i].IDF == all[j].IDF {
+			if all[i].TF == all[j].TF {
+				return all[i].Word < all[j].Word
+			}
+			return all[i].TF > all[j].TF
+		}
+		return all[i].IDF > all[j].IDF
+	})
+
+	start := min(n, len(all))
+	end := min(m, len(all))
+	return all[start:end]
 }

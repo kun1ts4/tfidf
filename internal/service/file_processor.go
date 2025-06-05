@@ -5,7 +5,7 @@ import (
 	"tfidf/internal/parser"
 )
 
-func ProcessFile(content []byte, top int) ([]model.WordTFIDF, error) {
+func ProcessFile(content []byte, top int) ([]model.Word, error) {
 	documents := parser.ExtractDocuments(content)
 	var allWords [][]string
 	for _, document := range documents {
@@ -13,6 +13,6 @@ func ProcessFile(content []byte, top int) ([]model.WordTFIDF, error) {
 	}
 
 	stats := CalculateTFIDF(allWords)
-	res := model.TopIDFRange(stats, 0, top)
+	res := TopIDFRange(stats, 0, top)
 	return res, nil
 }

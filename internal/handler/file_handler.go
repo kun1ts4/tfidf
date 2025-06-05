@@ -2,9 +2,11 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"io"
 	"log"
 	"net/http"
+	"tfidf/internal/model"
 	"tfidf/internal/service"
 	"time"
 )
@@ -49,10 +51,29 @@ func (h *Handler) UploadFile(c *gin.Context) {
 		}
 	}
 
-	uploadTime := time.Since(startUploadFileTime).Seconds()
+	timeProcessed := time.Since(startUploadFileTime).Seconds()
 
 	fileName := fileHeader.Filename
-	err = h.repo.RecordFileUpload(ctx, fileName, uploadTime)
+
+	document := model.Document{
+		Id:            generateUUID(),
+		Name:          fileName,
+		AuthorId:      0,   //TODO AUTHOR ID
+		Collections:   nil, //TODO COLLECTIONS
+		TimeProcessed: timeProcessed,
+	}
+
+	err = service.SaveFile(file, document.Id)
+	if err != nil {
+		log.Printf("ошибка сохранения файла на диск %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "внутренняя ошибка сервера",
+		})
+		return
+	}
+
+	err = h.repo.SaveFileInfo(ctx, document)
+
 	if err != nil {
 		log.Printf("ошибка записи информации о загрузке файла %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -64,4 +85,9 @@ func (h *Handler) UploadFile(c *gin.Context) {
 	c.HTML(http.StatusOK, "result.html", gin.H{
 		"Words": top50,
 	})
+}
+
+func generateUUID() string {
+	id := uuid.New().String()
+	return id
 }
