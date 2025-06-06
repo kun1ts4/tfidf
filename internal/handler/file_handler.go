@@ -22,21 +22,24 @@ func (h *Handler) UploadFile(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "ошибка загрузки файла",
 		})
+		return
 	}
 	defer file.Close()
 
 	content, err := io.ReadAll(file)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "ошибка чтения файла",
 		})
+		return
 	}
 
 	top50, err := service.ProcessFile(content, 50)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
+		return
 	}
 
 	ctx := c.Request.Context()
@@ -55,10 +58,21 @@ func (h *Handler) UploadFile(c *gin.Context) {
 
 	fileName := fileHeader.Filename
 
+	idValue, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "не удалось получить userID"})
+		return
+	}
+	authorID, ok := idValue.(int)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "internal error"})
+		return
+	}
+
 	document := model.Document{
 		Id:            generateUUID(),
 		Name:          fileName,
-		AuthorId:      0,   //TODO AUTHOR ID
+		AuthorId:      authorID,
 		Collections:   nil, //TODO COLLECTIONS
 		TimeProcessed: timeProcessed,
 	}

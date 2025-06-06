@@ -63,7 +63,7 @@ func SetupRouter(h *handler.Handler) *gin.Engine {
 	authorized := r.Group("/")
 	authorized.Use(h.Auth)
 	{
-		r.POST("/upload", h.UploadFile)
+		authorized.POST("/upload", h.UploadFile)
 	}
 
 	return r

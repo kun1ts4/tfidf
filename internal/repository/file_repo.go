@@ -28,11 +28,11 @@ func (r *Repository) CreateFileTable(ctx context.Context) error {
 
 func (r *Repository) SaveFileInfo(ctx context.Context, doc model.Document) error {
 	query := `
-        INSERT INTO documents (file_name, author_id, collections, time_processed)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO documents (id, file_name, author_id, collections, time_processed)
+        VALUES ($1, $2, $3, $4, $5)
     `
 
-	_, err := r.pool.Exec(ctx, query, doc.Name, doc.AuthorId, doc.Collections, doc.TimeProcessed)
+	_, err := r.pool.Exec(ctx, query, doc.Id, doc.Name, doc.AuthorId, doc.Collections, doc.TimeProcessed)
 	if err != nil {
 		return err
 	}

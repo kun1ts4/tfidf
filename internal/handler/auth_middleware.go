@@ -23,6 +23,15 @@ func (h *Handler) Auth(c *gin.Context) {
 		return
 	}
 
+	user, err := h.repo.GetUserByUsername(c.Request.Context(), username)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "неверный токен"})
+		c.Abort()
+		return
+	}
+
+	c.Set("userID", user.Id)
+
 	ctx := context.WithValue(c.Request.Context(), "user", username)
 	c.Request = c.Request.WithContext(ctx)
 }
