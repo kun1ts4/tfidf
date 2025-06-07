@@ -65,6 +65,12 @@ func SetupRouter(h *handler.Handler) *gin.Engine {
 	{
 		authorized.POST("/upload", h.UploadFile)
 		authorized.GET("/documents", h.GetUserDocuments)
+		authorized.GET("/documents/:id", h.GetDocumentById)
+		//authorized.GET("/documents/:id/statistics", h.GetStats)
+
+		authorized.GET("/logout", h.Logout)
+		authorized.PATCH("/user", h.ChangeUserPassword)
+		authorized.DELETE("/user", h.DeleteUser)
 	}
 
 	return r

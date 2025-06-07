@@ -31,3 +31,12 @@ func SaveFile(file multipart.File, name string) error {
 
 	return nil
 }
+
+func GetFile(name string) (string, error) {
+	filePath := fmt.Sprintf("%s/%s", uploadDir, name)
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		return "", fmt.Errorf("failed to read file: %v", err)
+	}
+	return string(content), nil
+}

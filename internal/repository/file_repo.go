@@ -41,7 +41,7 @@ func (r *Repository) SaveFileInfo(ctx context.Context, doc model.Document) error
 }
 
 func (r *Repository) GetFilesByAuthorId(ctx context.Context, authorId int) ([]model.Document, error) {
-	query := `SELECT * FROM documents WHERE author_id = $1`
+	query := `SELECT id, file_name, author_id, collections, time_processed FROM documents WHERE author_id = $1`
 	rows, err := r.pool.Query(ctx, query, authorId)
 	if err != nil {
 		return nil, err
@@ -51,7 +51,15 @@ func (r *Repository) GetFilesByAuthorId(ctx context.Context, authorId int) ([]mo
 	var documents []model.Document
 	for rows.Next() {
 		var document model.Document
+		err := rows.Scan(&document.Id, &document.Name, &document.AuthorId, &document.Collections, &document.TimeProcessed)
+		if err != nil {
+			return nil, err
+		}
 		documents = append(documents, document)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
 	}
 
 	return documents, nil

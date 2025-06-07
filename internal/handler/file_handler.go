@@ -120,7 +120,13 @@ func (h *Handler) GetUserDocuments(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(http.StatusOK, documents)
+
+	ids := make([]string, len(documents))
+	for i, doc := range documents {
+		ids[i] = doc.Id
+	}
+
+	c.JSON(http.StatusOK, ids)
 }
 
 func GetUserID(c *gin.Context) (int, error) {
@@ -134,3 +140,20 @@ func GetUserID(c *gin.Context) (int, error) {
 	}
 	return authorID, nil
 }
+
+func (h *Handler) GetDocumentById(c *gin.Context) {
+	fileID := c.Param("id")
+	file, err := service.GetFile(fileID)
+	if err != nil {
+		log.Printf("ошибка получения файла %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "внутренняя ошибка сервера",
+		})
+		return
+	}
+	c.Data(http.StatusOK, "text/plain", []byte(file))
+}
+
+//func (h *Handler) GetStats(c *gin.Context) {
+//
+//}
