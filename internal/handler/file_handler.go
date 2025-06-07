@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"io"
@@ -58,15 +59,12 @@ func (h *Handler) UploadFile(c *gin.Context) {
 
 	fileName := fileHeader.Filename
 
-	idValue, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "не удалось получить userID"})
-		return
-	}
-	authorID, ok := idValue.(int)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "internal error"})
-		return
+	authorID, err := GetUserID(c)
+	if err != nil {
+		log.Printf("не удалось получить UserID %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "внутренняя ошибка сервера",
+		})
 	}
 
 	document := model.Document{
@@ -104,4 +102,35 @@ func (h *Handler) UploadFile(c *gin.Context) {
 func generateUUID() string {
 	id := uuid.New().String()
 	return id
+}
+
+func (h *Handler) GetUserDocuments(c *gin.Context) {
+	userID, err := GetUserID(c)
+	if err != nil {
+		log.Printf("не удалось получить UserID %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "внутренняя ошибка сервера",
+		})
+	}
+	documents, err := h.repo.GetFilesByAuthorId(c.Request.Context(), userID)
+	if err != nil {
+		log.Printf("ошибка получения информации о файлах %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "внутренняя ошибка сервера",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, documents)
+}
+
+func GetUserID(c *gin.Context) (int, error) {
+	idValue, exists := c.Get("userID")
+	if !exists {
+		return 0, fmt.Errorf("user ID не существует")
+	}
+	authorID, ok := idValue.(int)
+	if !ok {
+		return 0, fmt.Errorf("user ID не существует")
+	}
+	return authorID, nil
 }

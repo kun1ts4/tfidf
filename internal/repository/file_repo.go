@@ -40,4 +40,19 @@ func (r *Repository) SaveFileInfo(ctx context.Context, doc model.Document) error
 	return nil
 }
 
-//save document as a file
+func (r *Repository) GetFilesByAuthorId(ctx context.Context, authorId int) ([]model.Document, error) {
+	query := `SELECT * FROM documents WHERE author_id = $1`
+	rows, err := r.pool.Query(ctx, query, authorId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var documents []model.Document
+	for rows.Next() {
+		var document model.Document
+		documents = append(documents, document)
+	}
+
+	return documents, nil
+}
