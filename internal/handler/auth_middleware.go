@@ -1,11 +1,12 @@
 package handler
 
 import (
-	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
+// Auth middleware for validating user tokens
+// @Security ApiKeyAuth
 func (h *Handler) Auth(c *gin.Context) {
 	authHeader := c.Request.Header.Get("Authorization")
 
@@ -31,7 +32,5 @@ func (h *Handler) Auth(c *gin.Context) {
 	}
 
 	c.Set("userID", user.Id)
-
-	ctx := context.WithValue(c.Request.Context(), "user", username)
-	c.Request = c.Request.WithContext(ctx)
+	c.Set("user", username)
 }

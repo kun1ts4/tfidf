@@ -17,6 +17,10 @@ import (
 // @title         TF-IDF API
 // @description   Это простой сервис, который помогает анализировать текстовые документы с помощью метода TF-IDF
 // @BasePath      /
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and the JWT token.
 func main() {
 	cfg, err := config.Initialize()
 	if err != nil {
@@ -47,14 +51,11 @@ func main() {
 func SetupRouter(h *handler.Handler) *gin.Engine {
 	r := gin.Default()
 
-	r.Static("/styles", "./web/templates")
-	r.LoadHTMLGlob("web/templates/*")
-
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	r.GET("/status", handler.Status)
 	r.GET("/version", handler.Version)
-	r.GET("/", handler.ShowForm)
+
 	r.POST("/register", h.RegisterUser)
 	r.POST("/login", h.Login)
 
@@ -66,11 +67,14 @@ func SetupRouter(h *handler.Handler) *gin.Engine {
 		authorized.POST("/upload", h.UploadFile)
 		authorized.GET("/documents", h.GetUserDocuments)
 		authorized.GET("/documents/:id", h.GetDocumentById)
-		//authorized.GET("/documents/:id/statistics", h.GetStats)
+		authorized.GET("/documents/:id/statistics", h.GetStats)
 
 		authorized.GET("/logout", h.Logout)
 		authorized.PATCH("/user", h.ChangeUserPassword)
 		authorized.DELETE("/user", h.DeleteUser)
+
+		//authorized.POST("/collection/:collection_id/:document_id", h.AddDocumentToCollection)
+		//authorized.GET("/collection/:collection_id", h.GetCollection)
 	}
 
 	return r

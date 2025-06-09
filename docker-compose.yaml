@@ -9,7 +9,7 @@ services:
     networks:
       - tfidf-network
     volumes:
-      - uploads-data:/app/uploads
+      - uploads-data:/uploads
     depends_on:
       - db
 

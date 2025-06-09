@@ -3,7 +3,6 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	_ "tfidf/cmd/api/docs"
 	"tfidf/internal/config"
 )
 
@@ -19,6 +18,14 @@ func Status(c *gin.Context) {
 	})
 }
 
+// Version godoc
+// @Summary Get app version
+// @Description Returns current application version from config
+// @Tags status
+// @Produce json
+// @Success 200 {object} map[string]interface{} "version"
+// @Failure 500 {object} map[string]interface{} "error message"
+// @Router /version [get]
 func Version(c *gin.Context) {
 	cfg, err := config.LoadConfig()
 	if err != nil {

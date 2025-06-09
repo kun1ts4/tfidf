@@ -1,7 +1,6 @@
 package handler
 
 import (
-	_ "tfidf/cmd/api/docs"
 	"tfidf/internal/repository"
 	"tfidf/internal/service"
 )
