@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	_ "tfidf/cmd/api/docs"
 	"tfidf/internal/model"
 )
 

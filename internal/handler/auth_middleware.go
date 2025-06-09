@@ -1,11 +1,12 @@
 package handler
 
 import (
-	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
+// Auth middleware for validating user tokens
+// @Security ApiKeyAuth
 func (h *Handler) Auth(c *gin.Context) {
 	authHeader := c.Request.Header.Get("Authorization")
 
@@ -23,6 +24,13 @@ func (h *Handler) Auth(c *gin.Context) {
 		return
 	}
 
-	ctx := context.WithValue(c.Request.Context(), "user", username)
-	c.Request = c.Request.WithContext(ctx)
+	user, err := h.repo.GetUserByUsername(c.Request.Context(), username)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "неверный токен"})
+		c.Abort()
+		return
+	}
+
+	c.Set("userID", user.Id)
+	c.Set("user", username)
 }

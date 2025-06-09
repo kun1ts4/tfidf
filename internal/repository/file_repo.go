@@ -28,11 +28,11 @@ func (r *Repository) CreateFileTable(ctx context.Context) error {
 
 func (r *Repository) SaveFileInfo(ctx context.Context, doc model.Document) error {
 	query := `
-        INSERT INTO documents (file_name, author_id, collections, time_processed)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO documents (id, file_name, author_id, collections, time_processed)
+        VALUES ($1, $2, $3, $4, $5)
     `
 
-	_, err := r.pool.Exec(ctx, query, doc.Name, doc.AuthorId, doc.Collections, doc.TimeProcessed)
+	_, err := r.pool.Exec(ctx, query, doc.Id, doc.Name, doc.AuthorId, doc.Collections, doc.TimeProcessed)
 	if err != nil {
 		return err
 	}
@@ -40,4 +40,27 @@ func (r *Repository) SaveFileInfo(ctx context.Context, doc model.Document) error
 	return nil
 }
 
-//save document as a file
+func (r *Repository) GetFilesByAuthorId(ctx context.Context, authorId int) ([]model.Document, error) {
+	query := `SELECT id, file_name, author_id, collections, time_processed FROM documents WHERE author_id = $1`
+	rows, err := r.pool.Query(ctx, query, authorId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var documents []model.Document
+	for rows.Next() {
+		var document model.Document
+		err := rows.Scan(&document.Id, &document.Name, &document.AuthorId, &document.Collections, &document.TimeProcessed)
+		if err != nil {
+			return nil, err
+		}
+		documents = append(documents, document)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return documents, nil
+}

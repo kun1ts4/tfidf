@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"tfidf/cmd/api/docs"
+	"tfidf/docs"
 )
 
 func Initialize() (*AppConfig, error) {

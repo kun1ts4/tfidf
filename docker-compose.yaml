@@ -8,6 +8,8 @@ services:
       - "${API_PORT}:${API_PORT}"
     networks:
       - tfidf-network
+    volumes:
+      - uploads-data:/uploads
     depends_on:
       - db
 
@@ -30,3 +32,4 @@ networks:
 
 volumes:
   pgdata:
+  uploads-data:

@@ -1,0 +1,556 @@
+basePath: /
+definitions:
+  model.ChangePasswordRequest:
+    properties:
+      new_password:
+        type: string
+    type: object
+  model.ErrorResponse:
+    description: Contains an error message for the user.
+    properties:
+      message:
+        example: неверный токен
+        type: string
+    type: object
+  model.MessageResponse:
+    description: Contains a message for the user.
+    properties:
+      message:
+        example: пользователь успешно удален
+        type: string
+    type: object
+  model.Metrics:
+    description: Contains various metrics related to file processing and word frequency
+      analysis.
+    properties:
+      avg_time_processed:
+        type: number
+      files_processed:
+        type: integer
+      latest_file_processed_timestamp:
+        type: string
+      max_time_processed:
+        type: number
+      min_time_processed:
+        type: number
+      peak_upload_time:
+        type: string
+      top_frequencies_words:
+        items:
+          $ref: '#/definitions/model.Word'
+        type: array
+    type: object
+  model.Stats:
+    description: Contains aggregated word statistics.
+    properties:
+      words:
+        items:
+          $ref: '#/definitions/model.Word'
+        type: array
+    type: object
+  model.TokenResponse:
+    description: Contains a JWT token for authentication.
+    properties:
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+    type: object
+  model.User:
+    description: Contains user credentials and identification information.
+    properties:
+      id:
+        type: integer
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  model.Word:
+    description: Represents a word and its associated metrics.
+    properties:
+      frequency:
+        type: integer
+      word:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: Это простой сервис, который помогает анализировать текстовые документы
+    с помощью метода TF-IDF
+  title: TF-IDF API
+paths:
+  /collection:
+    get:
+      description: Returns a list of all collections
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                type: string
+              type: array
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: List all collections
+      tags:
+      - collections
+    post:
+      description: Creates a new collection and returns its ID
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new collection
+      tags:
+      - collections
+  /collection/{collection_id}:
+    delete:
+      description: Deletes the specified collection
+      parameters:
+      - description: Collection ID
+        in: path
+        name: collection_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a collection
+      tags:
+      - collections
+    get:
+      description: Returns a list of documents in the specified collection
+      parameters:
+      - description: Collection ID
+        in: path
+        name: collection_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                type: string
+              type: array
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: List documents in a collection
+      tags:
+      - collections
+  /collection/{collection_id}/{document_id}:
+    delete:
+      description: Removes a document from the specified collection
+      parameters:
+      - description: Collection ID
+        in: path
+        name: collection_id
+        required: true
+        type: string
+      - description: Document ID
+        in: path
+        name: document_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Remove a document from a collection
+      tags:
+      - collections
+    post:
+      description: Adds a document to the specified collection
+      parameters:
+      - description: Collection ID
+        in: path
+        name: collection_id
+        required: true
+        type: string
+      - description: Document ID
+        in: path
+        name: document_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Add a document to a collection
+      tags:
+      - collections
+  /documents:
+    get:
+      description: Returns list of document IDs belonging to the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of document IDs
+          schema:
+            items:
+              type: string
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get user documents
+      tags:
+      - files
+  /documents/{id}:
+    get:
+      description: Returns file content by its ID
+      parameters:
+      - description: Document ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: File content
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get document by ID
+      tags:
+      - files
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return JWT token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.TokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: User login
+      tags:
+      - user
+  /logout:
+    get:
+      description: Logout endpoint
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MessageResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: User logout
+      tags:
+      - user
+  /metrics:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve various metrics related to file processing
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Metrics retrieved successfully
+          schema:
+            $ref: '#/definitions/model.Metrics'
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all metrics
+      tags:
+      - metrics
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account with username and password
+      parameters:
+      - description: User credentials
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Register a new user
+      tags:
+      - user
+  /stats:
+    get:
+      description: Returns system statistics (to be implemented)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Stats'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get statistics
+      tags:
+      - admin
+  /status:
+    get:
+      description: app status check
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Status endpoint
+      tags:
+      - status
+  /upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Uploads a file to the server
+      parameters:
+      - description: File to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Upload file
+      tags:
+      - files
+  /user:
+    delete:
+      description: Permanently delete authenticated user's account
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MessageResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete user account
+      tags:
+      - user
+    patch:
+      consumes:
+      - application/json
+      description: Change password for authenticated user
+      parameters:
+      - description: New password
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Change user password
+      tags:
+      - user
+  /version:
+    get:
+      description: Returns current application version from config
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: version
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: error message
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get app version
+      tags:
+      - status
+securityDefinitions:
+  ApiKeyAuth:
+    description: Type "Bearer" followed by a space and the JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -28,6 +28,16 @@ func (r *Repository) CreateUser(ctx context.Context, user model.User) error {
 	return nil
 }
 
+func (r *Repository) GetUserByUsername(ctx context.Context, username string) (model.User, error) {
+	query := `SELECT * FROM users WHERE username = $1`
+	var user model.User
+	err := r.pool.QueryRow(ctx, query, username).Scan(&user.Id, &user.Username, &user.Password)
+	if err != nil {
+		return model.User{}, err
+	}
+	return user, nil
+}
+
 func (r *Repository) CheckUserPassword(ctx context.Context, user model.User) (bool, error) {
 	query := `SELECT COUNT(*) FROM users WHERE username = $1 AND password = $2`
 	var count int
