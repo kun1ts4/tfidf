@@ -66,4 +66,7 @@ golang:1.23.0, postgres:15, Docker, Swagger
 [http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html)
 
 ## Changelog
-/CHANGELOG.md
+[CHANGELOG.md](CHANGELOG.md)
+
+## Схемы таблиц БД
+[DATABASE_SCHEMA.md](DATABASE_SCHEMA.md)
