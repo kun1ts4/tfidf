@@ -67,14 +67,20 @@ func SetupRouter(h *handler.Handler) *gin.Engine {
 		authorized.POST("/upload", h.UploadFile)
 		authorized.GET("/documents", h.GetUserDocuments)
 		authorized.GET("/documents/:id", h.GetDocumentById)
-		authorized.GET("/documents/:id/statistics", h.GetStats)
+		//TODO authorized.GET("/documents/:id/statistics", h.GetStats)
+		//TODO authorized.DELETE("/documents/:id", h.DeleteDocument)
 
 		authorized.GET("/logout", h.Logout)
 		authorized.PATCH("/user", h.ChangeUserPassword)
 		authorized.DELETE("/user", h.DeleteUser)
 
-		//authorized.POST("/collection/:collection_id/:document_id", h.AddDocumentToCollection)
-		//authorized.GET("/collection/:collection_id", h.GetCollection)
+		authorized.POST("/collection", h.CreateCollection)
+		authorized.POST("/collection/:collection_id/:document_id", h.AddDocumentToCollection)
+		authorized.GET("/collection", h.ListCollections)
+		authorized.GET("/collection/:collection_id", h.ListCollectionDocuments)
+		authorized.DELETE("/collection/:collection_id/:document_id", h.DeleteDocumentFromCollection)
+		authorized.DELETE("/collection/:collection_id", h.DeleteCollection)
+		//TODO GET /collections/<collection_id>/statistics
 	}
 
 	return r

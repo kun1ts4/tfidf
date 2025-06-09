@@ -28,5 +28,8 @@ func InitializeTables(repo *repository.Repository) error {
 	if err := repo.CreateFileTable(ctx); err != nil {
 		return fmt.Errorf("не удалось создать таблицу документов: %v", err)
 	}
+	if err := repo.CreateCollectionsTable(ctx); err != nil {
+		return fmt.Errorf("не удалось создать таблицу коллекций: %v", err)
+	}
 	return nil
 }

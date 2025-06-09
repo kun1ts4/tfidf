@@ -3,7 +3,6 @@ package handler
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"io"
 	"log"
 	"net/http"
@@ -57,7 +56,7 @@ func (h *Handler) UploadFile(c *gin.Context) {
 	}
 
 	document := model.Document{
-		Id:            generateUUID(),
+		Id:            service.GenerateUUID(),
 		Name:          fileName,
 		AuthorId:      authorID,
 		TimeProcessed: timeProcessed,
@@ -85,12 +84,6 @@ func (h *Handler) UploadFile(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "файл загружен успешно",
 	})
-}
-
-// generateUUID creates a new unique identifier
-func generateUUID() string {
-	id := uuid.New().String()
-	return id
 }
 
 // GetUserDocuments godoc
