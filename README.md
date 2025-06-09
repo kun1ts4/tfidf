@@ -6,24 +6,23 @@
 
 ```text
 .
-├── cmd/
-│   └── api/
-│       └── main.go         # Запуск приложения
-├── internal/
-│   ├── handler/            # Обработка HTTP-запросов
-│   ├── parser/             # Разбор и обработка текста
-│   ├── service/            # Основная логика и расчёты TF-IDF
-│   ├── model/              # Описание структур данных
-│   └── repository/         # Работа с базой данных
-├── pkg/
-│   └── db/                 # Подключение к БД
-└── web/
-    └── templates/          # HTML-шаблоны и стили
+├── CHANGELOG.md                  # Версии и изменения
+├── cmd/                          # Точки входа (API)
+├── configs/                      # Конфигурации (YAML, ENV)
+├── docker-compose.yaml           # Docker Compose для запуска приложения
+├── Dockerfile                    # Сборка контейнера
+├── docs/                         # Документация (Swagger)
+├── internal/                     # Внутренняя логика приложения:
+│   ├── handler/                  #   - HTTP-обработчики
+│   ├── service/                  #   - бизнес-логика
+│   ├── repository/               #   - работа с БД
+│   └── model/                    #   - сущности БД
+└── pkg/                          # Подключение к базе
 ```
 
 ## Запуск
 
-для запуска необходим валидный .env
+Для запуска необходим валидный .env
 ```bash
 # Склонируйте репозиторий
 git clone https://github.com/kun1ts4/tfidf
@@ -62,3 +61,9 @@ v1.0
 ## Технологии
 
 golang:1.23.0, postgres:15, Docker, Swagger
+
+## Документация API
+[http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html)
+
+## Changelog
+/CHANGELOG.md
