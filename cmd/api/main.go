@@ -10,6 +10,7 @@ import (
 	"tfidf/internal/db"
 	"tfidf/internal/handler"
 	"tfidf/internal/repository"
+	"time"
 
 	"tfidf/internal/service"
 )
@@ -32,6 +33,9 @@ func main() {
 		log.Fatalf("не удалось инициализировать базу данных: %v", err)
 	}
 	defer pgxPool.Close()
+
+	//ожидание создания таблиц
+	time.Sleep(2 * time.Second)
 
 	repo := repository.NewRepository(pgxPool)
 	if err := db.InitializeTables(repo); err != nil {
