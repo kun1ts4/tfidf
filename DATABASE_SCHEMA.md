@@ -1,34 +1,32 @@
 # Структура таблиц базы данных
 
-## Таблица users
+```mermaid
+erDiagram
+    collections ||--o{ documents : "1:N"
+    users ||--o{ documents : "1:N"
 
-| Поле     | Тип    | Описание                      |
-|----------|--------|-------------------------------|
-| id       | SERIAL | Первичный ключ                |
-| username | TEXT   | Уникальное имя пользователя   |
-| password | TEXT   | Пароль пользователя           |
+    collections {
+        text id PK
+    }
 
-## Таблица documents
+    documents {
+        text id PK
+        text file_name
+        integer author_id FK
+        text[] collections
+        numeric time_processed
+        timestamp upload_time
+    }
 
-| Поле          | Тип                        | Описание                        |
-|---------------|---------------------------|---------------------------------|
-| id            | TEXT                      | Первичный ключ (UUID)           |
-| file_name     | TEXT                      | Имя файла                       |
-| author_id     | INT                       | ID пользователя (внешний ключ)  |
-| collections   | TEXT[]                    | Массив id коллекций             |
-| time_processed| NUMERIC(10,3)             | Время обработки (секунды)       |
-| upload_time   | TIMESTAMP WITH TIME ZONE  | Время загрузки                  |
+    users {
+        integer id PK
+        text username
+        text password
+    }
 
-## Таблица collections
-
-| Поле | Тип  | Описание              |
-|------|------|-----------------------|
-| id   | TEXT | Первичный ключ (UUID) |
-
-## Таблица word_frequencies
-
-| Поле | Тип              | Описание         |
-|------|------------------|------------------|
-| id   | SERIAL           | Первичный ключ   |
-| word | TEXT             | Слово            |
-| freq | DOUBLE PRECISION | Частота          |
+    word_frequencies {
+        integer id PK
+        text word
+        doubleprecision freq
+    }
+```

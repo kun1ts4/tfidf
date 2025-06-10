@@ -27,6 +27,9 @@
 # Склонируйте репозиторий
 git clone https://github.com/kun1ts4/tfidf
 
+# Перейдите в папку с проектом
+cd tfidf
+
 # Запустите проект с помощью Docker
 docker-compose up -d
 ```
@@ -48,7 +51,7 @@ docker-compose up -d
 
 ## Версия
 
-v1.0
+v1.2
 
 ## Зависимости
 
