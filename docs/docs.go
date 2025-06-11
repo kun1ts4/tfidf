@@ -171,6 +171,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/collection/{collection_id}/statistics": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns the top 50 words with the highest IDF for documents in the collection",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "collections"
+                ],
+                "summary": "Get collection statistics",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Collection ID",
+                        "name": "collection_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/model.Word"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/collection/{collection_id}/{document_id}": {
             "post": {
                 "security": [
@@ -365,6 +411,105 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Deletes document by ID",
+                "tags": [
+                    "files"
+                ],
+                "summary": "Delete document",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Document ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.MessageResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/documents/{id}/statistics": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns the top 50 words with the highest TF-IDF for the specified document",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "files"
+                ],
+                "summary": "Get document statistics",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Document ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/model.Word"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
             }
         },
         "/login": {
@@ -513,43 +658,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/model.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/stats": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Returns system statistics (to be implemented)",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "admin"
-                ],
-                "summary": "Get statistics",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Stats"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/model.ErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/model.ErrorResponse"
                         }
@@ -809,18 +917,6 @@ const docTemplate = `{
                 }
             }
         },
-        "model.Stats": {
-            "description": "Contains aggregated word statistics.",
-            "type": "object",
-            "properties": {
-                "words": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.Word"
-                    }
-                }
-            }
-        },
         "model.TokenResponse": {
             "description": "Contains a JWT token for authentication.",
             "type": "object",
@@ -852,6 +948,12 @@ const docTemplate = `{
             "properties": {
                 "frequency": {
                     "type": "integer"
+                },
+                "idf": {
+                    "type": "number"
+                },
+                "tf": {
+                    "type": "number"
                 },
                 "word": {
                     "type": "string"

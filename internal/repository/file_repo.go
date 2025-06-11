@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"log"
+	"strings"
 	"tfidf/internal/model"
 )
 
@@ -63,4 +64,24 @@ func (r *Repository) GetFilesByAuthorId(ctx context.Context, authorId int) ([]mo
 	}
 
 	return documents, nil
+}
+
+func (r *Repository) DeleteDocument(ctx context.Context, id string) error {
+	query := `DELETE FROM documents WHERE id = $1`
+	_, err := r.pool.Exec(ctx, query, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *Repository) GetFileCollections(ctx context.Context, id string) ([]string, error) {
+	query := `SELECT array_to_string(collections, ',') FROM documents WHERE id = $1`
+	var s string
+	err := r.pool.QueryRow(ctx, query, id).Scan(&s)
+	if err != nil {
+		return nil, err
+	}
+
+	return strings.Split(s, ","), nil
 }

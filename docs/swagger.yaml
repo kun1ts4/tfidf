@@ -40,14 +40,6 @@ definitions:
           $ref: '#/definitions/model.Word'
         type: array
     type: object
-  model.Stats:
-    description: Contains aggregated word statistics.
-    properties:
-      words:
-        items:
-          $ref: '#/definitions/model.Word'
-        type: array
-    type: object
   model.TokenResponse:
     description: Contains a JWT token for authentication.
     properties:
@@ -70,6 +62,10 @@ definitions:
     properties:
       frequency:
         type: integer
+      idf:
+        type: number
+      tf:
+        type: number
       word:
         type: string
     type: object
@@ -240,6 +236,36 @@ paths:
       summary: Add a document to a collection
       tags:
       - collections
+  /collection/{collection_id}/statistics:
+    get:
+      description: Returns the top 50 words with the highest IDF for documents in
+        the collection
+      parameters:
+      - description: Collection ID
+        in: path
+        name: collection_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/model.Word'
+              type: array
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get collection statistics
+      tags:
+      - collections
   /documents:
     get:
       description: Returns list of document IDs belonging to the authenticated user
@@ -266,6 +292,40 @@ paths:
       tags:
       - files
   /documents/{id}:
+    delete:
+      description: Deletes document by ID
+      parameters:
+      - description: Document ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete document
+      tags:
+      - files
     get:
       description: Returns file content by its ID
       parameters:
@@ -300,6 +360,36 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get document by ID
+      tags:
+      - files
+  /documents/{id}/statistics:
+    get:
+      description: Returns the top 50 words with the highest TF-IDF for the specified
+        document
+      parameters:
+      - description: Document ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/model.Word'
+              type: array
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get document statistics
       tags:
       - files
   /login:
@@ -401,29 +491,6 @@ paths:
       summary: Register a new user
       tags:
       - user
-  /stats:
-    get:
-      description: Returns system statistics (to be implemented)
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Stats'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Get statistics
-      tags:
-      - admin
   /status:
     get:
       description: app status check
