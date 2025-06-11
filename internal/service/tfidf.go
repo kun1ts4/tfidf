@@ -6,43 +6,68 @@ import (
 	"tfidf/internal/model"
 )
 
-func CalculateTFIDF(allDocs [][]string) []model.Word {
+func CalculateTFIDF(allDocs [][]string, docIndex int) (docStats []model.Word, collectionStats []model.Word) {
 	docCount := len(allDocs)
-	wordDocFrequency := make(map[string]int)
-	wordTotalFrequency := make(map[string]int)
-	totalWords := 0
-
-	for _, doc := range allDocs {
-		seen := make(map[string]bool)
-		for _, word := range doc {
-			wordTotalFrequency[word]++
-			if !seen[word] {
-				wordDocFrequency[word]++
-				seen[word] = true
-			}
-		}
-		totalWords += len(doc)
+	if docIndex >= docCount {
+		return nil, nil
 	}
 
-	stats := make([]model.Word, 0, len(wordTotalFrequency))
+	collectionWordFreq := make(map[string]int)
+	collectionTotalWords := 0
+	wordDocFrequency := make(map[string]int)
 
-	for word, count := range wordTotalFrequency {
-		tf := float64(count) / float64(totalWords)
-		df := wordDocFrequency[word]
-		idf := 0.0
-		if df > 0 {
-			idf = math.Log(float64(docCount) / float64(df))
+	docWordFreq := make(map[string]int)
+	docTotalWords := len(allDocs[docIndex])
+
+	// Собираем статистику по всем документам
+	for _, doc := range allDocs {
+		seenInDoc := make(map[string]bool)
+		for _, word := range doc {
+			collectionWordFreq[word]++
+			collectionTotalWords++
+
+			if !seenInDoc[word] {
+				wordDocFrequency[word]++
+				seenInDoc[word] = true
+			}
 		}
+	}
 
-		stat := model.Word{
+	seenInTargetDoc := make(map[string]bool)
+	for _, word := range allDocs[docIndex] {
+		docWordFreq[word]++
+		if !seenInTargetDoc[word] {
+			seenInTargetDoc[word] = true
+		}
+	}
+
+	for word, count := range docWordFreq {
+		df := wordDocFrequency[word]
+		idf := math.Log(float64(docCount) / float64(df))
+		tf := float64(count) / float64(docTotalWords)
+
+		docStats = append(docStats, model.Word{
 			Word: word,
 			TF:   tf,
 			IDF:  idf,
 			Freq: count,
-		}
-		stats = append(stats, stat)
+		})
 	}
-	return stats
+
+	for word, count := range collectionWordFreq {
+		df := wordDocFrequency[word]
+		idf := math.Log(float64(docCount) / float64(df))
+		tf := float64(count) / float64(collectionTotalWords)
+
+		collectionStats = append(collectionStats, model.Word{
+			Word: word,
+			TF:   tf,
+			IDF:  idf,
+			Freq: count,
+		})
+	}
+
+	return docStats, collectionStats
 }
 
 func TopIDFRange(all []model.Word, n int, m int) []model.Word {

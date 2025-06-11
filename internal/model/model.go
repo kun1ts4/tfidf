@@ -4,8 +4,8 @@ package model
 // @Description Represents a word and its associated metrics.
 type Word struct {
 	Word string  `json:"word"`
-	TF   float64 `json:"-"`
-	IDF  float64 `json:"-" `
+	TF   float64 `json:"tf"`
+	IDF  float64 `json:"idf" `
 	Freq int     `json:"frequency"`
 }
 

@@ -159,16 +159,29 @@ func (h *Handler) GetDocumentById(c *gin.Context) {
 	c.Data(http.StatusOK, "text/plain", []byte(file))
 }
 
-// GetStats godoc
-// @Summary Get statistics
-// @Description Returns system statistics (to be implemented)
-// @Tags admin
+// DeleteDocument godoc
+// @Summary Delete document
+// @Description Deletes document by ID
+// @Tags files
 // @Security ApiKeyAuth
-// @Produce json
-// @Success 200 {object} model.Stats
+// @Param id path string true "Document ID"
+// @Success 200 {object} model.MessageResponse
+// @Failure 400 {object} model.ErrorResponse
 // @Failure 401 {object} model.ErrorResponse
-// @Failure 403 {object} model.ErrorResponse
-// @Router /stats [get]
-func (h *Handler) GetStats(c *gin.Context) {
-	// TODO: Implement statistics endpoint
+// @Failure 404 {object} model.ErrorResponse
+// @Failure 500 {object} model.ErrorResponse
+// @Router /documents/{id} [delete]
+func (h *Handler) DeleteDocument(c *gin.Context) {
+	fileID := c.Param("id")
+	err := h.repo.DeleteDocument(c, fileID)
+	if err != nil {
+		log.Printf("не удалось удалить документ %v", err)
+		c.JSON(http.StatusOK, gin.H{
+			"message": "не удалось удалить документ",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "документ удален",
+	})
 }
