@@ -5,6 +5,7 @@
         "title": "TF-IDF API",
         "contact": {}
     },
+    "host": "37.9.53.154:8080",
     "basePath": "/",
     "paths": {
         "/collection": {
