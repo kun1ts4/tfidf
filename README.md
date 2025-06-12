@@ -34,7 +34,7 @@ cd tfidf
 docker-compose up -d
 ```
 
-После запуска приложение будет доступно по адресу: [http://localhost:8080](http://localhost:8080)
+После запуска приложение будет доступно по адресу: [http://localhost](http://localhost)
 
 ## Конфигурация
 
@@ -48,7 +48,6 @@ docker-compose up -d
 | DB_PASSWORD| Пароль пользователя базы данных | password        |
 | DB_NAME    | Имя базы данных                 | postgres        |
 | API_PORT   | Порт для API                    | 8080            |
-| API_HOST   | Хост для API                    | localhost       |
 
 ## Версия
 
@@ -73,7 +72,7 @@ v1.2
 golang:1.23.0, postgres:15, Docker, Swagger
 
 ## Документация API
-[http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html)
+[http://localhost/swagger/index.html](http://localhost/swagger/index.html)
 
 ## Changelog
 [CHANGELOG.md](CHANGELOG.md)
