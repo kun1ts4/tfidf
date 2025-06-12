@@ -17,7 +17,6 @@ import (
 
 // @title         TF-IDF API
 // @description   Это простой сервис, который помогает анализировать текстовые документы с помощью метода TF-IDF
-// @host		  37.9.53.154:8080
 // @BasePath      /
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header

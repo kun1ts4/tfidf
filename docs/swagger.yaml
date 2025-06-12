@@ -69,7 +69,6 @@ definitions:
       word:
         type: string
     type: object
-host: 37.9.53.154:8080
 info:
   contact: {}
   description: Это простой сервис, который помогает анализировать текстовые документы
