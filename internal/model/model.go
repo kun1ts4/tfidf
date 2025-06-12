@@ -24,7 +24,7 @@ type Metrics struct {
 // User represents a system user.
 // @Description Contains user credentials and identification information.
 type User struct {
-	Id       int    `json:"id"`
+	Id       int    `json:"id" swaggerignore:"true"`
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
