@@ -931,9 +931,6 @@ const docTemplate = `{
             "description": "Contains user credentials and identification information.",
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer"
-                },
                 "password": {
                     "type": "string"
                 },

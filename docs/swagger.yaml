@@ -50,8 +50,6 @@ definitions:
   model.User:
     description: Contains user credentials and identification information.
     properties:
-      id:
-        type: integer
       password:
         type: string
       username:

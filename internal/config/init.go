@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 	"tfidf/docs"
 )
 
@@ -12,6 +13,6 @@ func Initialize() (*AppConfig, error) {
 	}
 
 	docs.SwaggerInfo.Version = cfg.App.Version
-	//docs.SwaggerInfo.Host = "localhost:" + cfg.App.Port
+	docs.SwaggerInfo.Host = os.Getenv("API_HOST") + ":" + cfg.App.Port
 	return cfg, nil
 }
