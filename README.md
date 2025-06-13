@@ -51,7 +51,7 @@ docker-compose up --build -d
 
 ## Версия
 
-v1.2
+v1.3
 
 ## Зависимости
 
