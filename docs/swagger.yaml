@@ -288,7 +288,7 @@ paths:
       - ApiKeyAuth: []
       summary: Get user documents
       tags:
-      - files
+      - documents
   /documents/{id}:
     delete:
       description: Deletes document by ID
@@ -323,7 +323,7 @@ paths:
       - ApiKeyAuth: []
       summary: Delete document
       tags:
-      - files
+      - documents
     get:
       description: Returns file content by its ID
       parameters:
@@ -359,7 +359,33 @@ paths:
       - ApiKeyAuth: []
       summary: Get document by ID
       tags:
-      - files
+      - documents
+  /documents/{id}/huffman:
+    get:
+      description: Returns the Huffman code and code tree for the specified document
+      parameters:
+      - description: Document ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Huffman encoding for a document
+      tags:
+      - documents
   /documents/{id}/statistics:
     get:
       description: Returns the top 50 words with the highest TF-IDF for the specified
@@ -534,7 +560,7 @@ paths:
       - ApiKeyAuth: []
       summary: Upload file
       tags:
-      - files
+      - documents
   /user:
     delete:
       description: Permanently delete authenticated user's account

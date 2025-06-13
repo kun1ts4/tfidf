@@ -85,3 +85,13 @@ func (r *Repository) GetFileCollections(ctx context.Context, id string) ([]strin
 
 	return strings.Split(s, ","), nil
 }
+
+func (r *Repository) CheckFileExists(ctx context.Context, id string) (bool, error) {
+	query := `SELECT EXISTS(SELECT 1 FROM documents WHERE id = $1)`
+	var exists bool
+	err := r.pool.QueryRow(ctx, query, id).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
+}

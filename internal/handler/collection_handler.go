@@ -61,7 +61,17 @@ func (h *Handler) AddDocumentToCollection(c *gin.Context) {
 	collectionID := c.Param("collection_id")
 	documentID := c.Param("document_id")
 
-	err := h.repo.AddFileToCollection(c, collectionID, documentID)
+	exists, err := h.repo.CheckFileExists(c, documentID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "не удалось проверить существование документа"})
+		return
+	}
+
+	if !exists {
+		c.JSON(http.StatusNotFound, gin.H{"error": "документ не существует"})
+	}
+
+	err = h.repo.AddFileToCollection(c, collectionID, documentID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "не удалось добавить документ в коллекцию"})
 		return

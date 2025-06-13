@@ -14,7 +14,7 @@ import (
 // UploadFile godoc
 // @Summary Upload file
 // @Description Uploads a file to the server
-// @Tags files
+// @Tags documents
 // @Security ApiKeyAuth
 // @Accept multipart/form-data
 // @Produce json
@@ -89,7 +89,7 @@ func (h *Handler) UploadFile(c *gin.Context) {
 // GetUserDocuments godoc
 // @Summary Get user documents
 // @Description Returns list of document IDs belonging to the authenticated user
-// @Tags files
+// @Tags documents
 // @Security ApiKeyAuth
 // @Produce json
 // @Success 200 {array} string "List of document IDs"
@@ -136,7 +136,7 @@ func GetUserID(c *gin.Context) (int, error) {
 // GetDocumentById godoc
 // @Summary Get document by ID
 // @Description Returns file content by its ID
-// @Tags files
+// @Tags documents
 // @Security ApiKeyAuth
 // @Produce text/plain
 // @Param id path string true "Document ID"
@@ -162,7 +162,7 @@ func (h *Handler) GetDocumentById(c *gin.Context) {
 // DeleteDocument godoc
 // @Summary Delete document
 // @Description Deletes document by ID
-// @Tags files
+// @Tags documents
 // @Security ApiKeyAuth
 // @Param id path string true "Document ID"
 // @Success 200 {object} model.MessageResponse
