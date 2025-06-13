@@ -327,7 +327,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "files"
+                    "documents"
                 ],
                 "summary": "Get user documents",
                 "responses": {
@@ -367,7 +367,7 @@ const docTemplate = `{
                     "text/plain"
                 ],
                 "tags": [
-                    "files"
+                    "documents"
                 ],
                 "summary": "Get document by ID",
                 "parameters": [
@@ -420,7 +420,7 @@ const docTemplate = `{
                 ],
                 "description": "Deletes document by ID",
                 "tags": [
-                    "files"
+                    "documents"
                 ],
                 "summary": "Delete document",
                 "parameters": [
@@ -455,6 +455,47 @@ const docTemplate = `{
                         "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/documents/{id}/huffman": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns the Huffman code and code tree for the specified document",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "documents"
+                ],
+                "summary": "Get Huffman encoding for a document",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Document ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "500": {
@@ -697,7 +738,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "files"
+                    "documents"
                 ],
                 "summary": "Upload file",
                 "parameters": [

@@ -73,7 +73,7 @@ func SetupRouter(h *handler.Handler) *gin.Engine {
 		authorized.GET("/documents/:id", h.GetDocumentById)
 		authorized.GET("/documents/:id/statistics", h.GetDocumentStats)
 		authorized.DELETE("/documents/:id", h.DeleteDocument)
-		//TODO authorized.GET("/documents/:id/huffman", h.GetHuffman)
+		authorized.GET("/documents/:id/huffman", h.GetHuffman)
 
 		authorized.GET("/logout", h.Logout)
 		authorized.PATCH("/user", h.ChangeUserPassword)

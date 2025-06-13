@@ -45,7 +45,7 @@ func (h *Handler) GetCollectionStats(c *gin.Context) {
 // GetDocumentStats returns the top 50 words with the highest TF-IDF for a specific document.
 // @Summary Get document statistics
 // @Description Returns the top 50 words with the highest TF-IDF for the specified document
-// @Tags files
+// @Tags documents
 // @Security ApiKeyAuth
 // @Produce json
 // @Param id path string true "Document ID"
