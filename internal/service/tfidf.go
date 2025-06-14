@@ -72,13 +72,13 @@ func CalculateTFIDF(allDocs [][]string, docIndex int) (docStats []model.Word, co
 
 func TopIDFRange(all []model.Word, n int, m int) []model.Word {
 	sort.Slice(all, func(i, j int) bool {
-		if all[i].IDF == all[j].IDF {
-			if all[i].TF == all[j].TF {
-				return all[i].Word < all[j].Word
-			}
-			return all[i].TF > all[j].TF
+		if all[i].TF != all[j].TF {
+			return all[i].TF < all[j].TF
 		}
-		return all[i].IDF > all[j].IDF
+		if all[i].IDF != all[j].IDF {
+			return all[i].IDF > all[j].IDF
+		}
+		return all[i].Word < all[j].Word
 	})
 
 	start := min(n, len(all))
