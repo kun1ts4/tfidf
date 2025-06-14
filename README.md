@@ -51,7 +51,7 @@ docker-compose up -d
 
 ## Версия
 
-v1.2
+v1.3
 
 ## Зависимости
 
@@ -69,7 +69,7 @@ v1.2
 
 ## Технологии
 
-golang:1.23.0, postgres:15, Docker, Swagger
+Go, Postgres, Docker, Swagger, Nginx, JWT
 
 ## Документация API
 [http://localhost/swagger/index.html](http://localhost/swagger/index.html)

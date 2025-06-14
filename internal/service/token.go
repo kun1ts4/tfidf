@@ -2,11 +2,13 @@ package service
 
 import (
 	"github.com/golang-jwt/jwt/v5"
+	"sync"
 	"time"
 )
 
 type TokenService struct {
-	secret string
+	secret    string
+	blacklist sync.Map
 }
 
 type Claims struct {
@@ -36,6 +38,10 @@ func (t *TokenService) GenerateToken(username string) (string, error) {
 }
 
 func (t *TokenService) ValidateToken(tokenString string) (string, error) {
+	if t.isBlacklisted(tokenString) {
+		return "", jwt.ErrTokenInvalidClaims
+	}
+
 	claims := &Claims{}
 
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
@@ -45,4 +51,37 @@ func (t *TokenService) ValidateToken(tokenString string) (string, error) {
 		return "", err
 	}
 	return claims.Username, nil
+}
+
+func (t *TokenService) parseToken(tokenString string) (*Claims, error) {
+	claims := &Claims{}
+	_, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(t.secret), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return claims, nil
+}
+
+func (t *TokenService) addToBlacklist(tokenString string, expiration time.Duration) {
+	t.blacklist.Store(tokenString, true)
+	time.AfterFunc(expiration, func() {
+		t.blacklist.Delete(tokenString)
+	})
+}
+
+func (t *TokenService) isBlacklisted(tokenString string) bool {
+	_, ok := t.blacklist.Load(tokenString)
+	return ok
+}
+
+func (t *TokenService) InvalidateToken(tokenString string) error {
+	claims, err := t.parseToken(tokenString)
+	if err != nil {
+		return err
+	}
+	expiration := time.Until(claims.ExpiresAt.Time)
+	t.addToBlacklist(tokenString, expiration)
+	return nil
 }

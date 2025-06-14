@@ -90,7 +90,16 @@ func (h *Handler) Login(c *gin.Context) {
 // @Success 200 {object} model.MessageResponse
 // @Router /logout [get]
 func (h *Handler) Logout(c *gin.Context) {
-	//TODO LOgout
+	authHeader := c.Request.Header.Get("Authorization")
+
+	tokenString := authHeader[len("Bearer "):]
+
+	err := h.tokenService.InvalidateToken(tokenString)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "не удалось сделать токен недействительным"})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{"message": "вы вышли из системы"})
 }
 
