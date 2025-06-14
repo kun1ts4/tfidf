@@ -69,7 +69,7 @@ v1.3
 
 ## Технологии
 
-golang:1.23.0, postgres:15, Docker, Swagger
+Go, Postgres, Docker, Swagger, Nginx, JWT
 
 ## Документация API
 [http://localhost/swagger/index.html](http://localhost/swagger/index.html)

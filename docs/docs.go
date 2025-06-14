@@ -519,7 +519,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "files"
+                    "documents"
                 ],
                 "summary": "Get document statistics",
                 "parameters": [
