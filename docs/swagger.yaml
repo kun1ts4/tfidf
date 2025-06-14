@@ -415,7 +415,7 @@ paths:
       - ApiKeyAuth: []
       summary: Get document statistics
       tags:
-      - files
+      - documents
   /login:
     post:
       consumes:
