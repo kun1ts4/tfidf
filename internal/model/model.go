@@ -6,7 +6,7 @@ type Word struct {
 	Word string  `json:"word"`
 	TF   float64 `json:"tf"`
 	IDF  float64 `json:"idf" `
-	Freq int     `json:"frequency"`
+	Freq int     `json:"-"`
 }
 
 // Metrics represents application metrics for processing files.
