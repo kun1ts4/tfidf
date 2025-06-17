@@ -31,7 +31,7 @@ git clone https://github.com/kun1ts4/tfidf
 cd tfidf
 
 # Запустите проект с помощью Docker
-docker-compose up -d
+docker-compose up --build -d
 ```
 
 После запуска приложение будет доступно по адресу: [http://localhost](http://localhost)
