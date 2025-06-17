@@ -13,7 +13,7 @@ type Word struct {
 // @Description Contains various metrics related to file processing and word frequency analysis.
 type Metrics struct {
 	PeakUploadTime               string  `json:"peak_upload_time"`
-	TopFrequenciesWords          []Word  `json:"top_frequencies_words"`
+	UsersCount                   int     `json:"registered_users_count"`
 	FilesProcessed               int     `json:"files_processed"`
 	MinTimeProcessed             float64 `json:"min_time_processed"`
 	AvgTimeProcessed             float64 `json:"avg_time_processed"`

@@ -65,3 +65,13 @@ func (r *Repository) DeleteUser(ctx context.Context, username string) error {
 	}
 	return nil
 }
+
+func (r *Repository) GetNumberOfUsers(ctx context.Context) (int, error) {
+	query := `SELECT COUNT(*) FROM users`
+	var count int
+	err := r.pool.QueryRow(ctx, query).Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
