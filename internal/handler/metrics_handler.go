@@ -26,15 +26,6 @@ func (h *Handler) GetMetrics(c *gin.Context) {
 		return
 	}
 
-	topFreqWords, err := h.repo.GetTopFreqWords(c.Request.Context(), 5)
-	if err != nil {
-		log.Printf("ошибка получения топ-5 частотных слов %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "ошибка получения метрик",
-		})
-		return
-	}
-
 	filesProcessed, err := h.repo.GetFilesProcessed(c.Request.Context())
 	if err != nil {
 		log.Printf("ошибка получения количества обработанных файлов %v", err)
@@ -80,9 +71,18 @@ func (h *Handler) GetMetrics(c *gin.Context) {
 		return
 	}
 
+	usersCount, err := h.repo.GetNumberOfUsers(c.Request.Context())
+	if err != nil {
+		log.Printf("ошибка получения количества пользователей %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "ошибка получения метрик",
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, model.Metrics{
 		PeakUploadTime:               peakUploadTime,
-		TopFrequenciesWords:          topFreqWords,
+		UsersCount:                   usersCount,
 		FilesProcessed:               filesProcessed,
 		MinTimeProcessed:             minTimeProcessed,
 		AvgTimeProcessed:             avgTimeProcessed,
